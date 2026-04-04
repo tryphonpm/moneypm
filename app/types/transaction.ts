@@ -13,6 +13,7 @@ export type TransactionType =
 
 export interface Transaction {
   _id: string
+  compteId: string
   fitId: string
   date: string
   type: TransactionType

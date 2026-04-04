@@ -10,22 +10,20 @@ const TYPES = [
   'Service Charge', 'Transfer', 'Virement',
 ] as const
 
-// Copie locale éditable
 const form = reactive({
-  date:        new Date(props.transaction.date).toISOString().slice(0, 10),
-  type:        props.transaction.type,
-  beneficiaire:props.transaction.beneficiaire,
-  categories:  [...props.transaction.categories],
-  etiquettes:  [...props.transaction.etiquettes],
-  memo:        props.transaction.memo,
+  date:         new Date(props.transaction.date).toISOString().slice(0, 10),
+  type:         props.transaction.type,
+  beneficiaire: props.transaction.beneficiaire,
+  categories:   [...props.transaction.categories],
+  etiquettes:   [...props.transaction.etiquettes],
+  memo:         props.transaction.memo,
 })
 
 const saving = ref(false)
 const error  = ref('')
 
 async function save() {
-  saving.value = true
-  error.value  = ''
+  saving.value = true; error.value = ''
   try {
     const updated = await $fetch<Transaction>(`/api/transactions/${props.transaction._id}`, {
       method: 'PUT',
@@ -46,7 +44,6 @@ async function save() {
     <div class="modal-body">
       <form class="space-y-4" @submit.prevent="save">
 
-        <!-- Date + Type -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="form-label">Date</label>
@@ -59,7 +56,7 @@ async function save() {
                 <option v-for="t in TYPES" :key="t" :value="t">{{ t }}</option>
               </select>
               <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
@@ -67,44 +64,37 @@ async function save() {
           </div>
         </div>
 
-        <!-- Bénéficiaire -->
         <div>
           <label class="form-label">Bénéficiaire</label>
           <input v-model="form.beneficiaire" type="text" class="form-input" placeholder="Nom du bénéficiaire" />
         </div>
 
-        <!-- Montant (lecture seule) -->
         <div>
           <label class="form-label">Montant</label>
-          <div :class="['form-input bg-gray-50 font-mono font-semibold', transaction.montant >= 0 ? 'text-green-600' : 'text-red-600']">
+          <div :class="[
+            'form-input bg-gray-700/50 font-mono font-semibold cursor-default',
+            transaction.montant >= 0 ? 'text-emerald-400' : 'text-red-400'
+          ]">
             {{ transaction.montant >= 0 ? '+' : '' }}{{ transaction.montant.toFixed(2) }} €
           </div>
         </div>
 
-        <!-- Catégories -->
         <div>
           <label class="form-label">Catégories</label>
           <AppTagInput v-model="form.categories" />
         </div>
 
-        <!-- Étiquettes -->
         <div>
           <label class="form-label">Étiquettes</label>
           <AppTagInput v-model="form.etiquettes" />
         </div>
 
-        <!-- Mémo -->
         <div>
           <label class="form-label">Mémo</label>
-          <textarea
-            v-model="form.memo"
-            class="form-input resize-none"
-            rows="3"
-            placeholder="Notes libres…"
-          />
+          <textarea v-model="form.memo" class="form-input resize-none" rows="3" placeholder="Notes libres…" />
         </div>
 
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="text-sm text-red-400">{{ error }}</p>
       </form>
     </div>
 

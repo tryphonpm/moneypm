@@ -1,37 +1,46 @@
 import { connectDB } from '../../utils/mongodb'
 import { Transaction } from '../../models/Transaction'
+import { Account } from '../../models/Account'
 import { parseOFX } from '../../utils/ofxParser'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
 
-  // Lecture du body multipart
   const formData = await readMultipartFormData(event)
   if (!formData || formData.length === 0) {
     throw createError({ statusCode: 400, message: 'Aucun fichier reçu' })
   }
 
-  const file = formData.find((f) => f.name === 'file')
-  if (!file || !file.data) {
+  const filePart    = formData.find((f) => f.name === 'file')
+  const compteIdPart = formData.find((f) => f.name === 'compteId')
+
+  if (!filePart?.data) {
     throw createError({ statusCode: 400, message: 'Champ "file" manquant' })
   }
+  if (!compteIdPart?.data) {
+    throw createError({ statusCode: 400, message: 'Champ "compteId" manquant' })
+  }
 
-  // Décodage — les fichiers OFX français sont souvent en Windows-1252
-  // Node Buffer.toString('latin1') couvre le charset 1252 de base
-  const content = file.data.toString('latin1')
+  const compteId = compteIdPart.data.toString('utf-8').trim()
 
+  const compte = await Account.findById(compteId).lean()
+  if (!compte) {
+    throw createError({ statusCode: 404, message: 'Compte introuvable' })
+  }
+
+  const content = filePart.data.toString('latin1')
   const { transactions, dateStart, dateEnd, bankId, acctId } = parseOFX(content)
 
   if (transactions.length === 0) {
     throw createError({ statusCode: 422, message: 'Aucune transaction trouvée dans le fichier OFX' })
   }
 
-  // Insertion avec upsert sur fitId pour éviter les doublons
   const ops = transactions.map((t) => ({
     updateOne: {
       filter: { fitId: t.fitId },
       update: {
         $setOnInsert: {
+          compteId,
           fitId:        t.fitId,
           date:         t.date,
           type:         t.type,

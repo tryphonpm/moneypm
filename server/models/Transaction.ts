@@ -1,4 +1,4 @@
-import mongoose, { Schema, type Document } from 'mongoose'
+import mongoose, { Schema, Types, type Document } from 'mongoose'
 
 export type TransactionType =
   | 'ATM'
@@ -14,11 +14,12 @@ export type TransactionType =
   | 'Virement'
 
 export interface ITransaction extends Document {
+  compteId: Types.ObjectId
   fitId: string
   date: Date
   type: TransactionType
   beneficiaire: string
-  montant: number          // négatif = retrait, positif = dépôt
+  montant: number
   categories: string[]
   etiquettes: string[]
   memo: string
@@ -28,6 +29,7 @@ export interface ITransaction extends Document {
 
 const TransactionSchema = new Schema<ITransaction>(
   {
+    compteId:    { type: Schema.Types.ObjectId, ref: 'Account', required: true },
     fitId:       { type: String, required: true, unique: true },
     date:        { type: Date, required: true },
     type:        { type: String, required: true },
@@ -39,14 +41,10 @@ const TransactionSchema = new Schema<ITransaction>(
     checkNum:    { type: String },
     importedAt:  { type: Date, default: Date.now },
   },
-  {
-    timestamps: false,
-    versionKey: false,
-  }
+  { timestamps: false, versionKey: false }
 )
 
-// Index pour les requêtes fréquentes
-TransactionSchema.index({ date: -1 })
+TransactionSchema.index({ compteId: 1, date: -1 })
 
 export const Transaction =
   mongoose.models.Transaction ||

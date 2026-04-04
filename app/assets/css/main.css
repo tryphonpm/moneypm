@@ -7,112 +7,143 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
+    @apply dark:bg-gray-950 dark:text-gray-100;
   }
-
   * {
-    @apply border-gray-200;
+    @apply border-gray-200 dark:border-gray-700;
   }
 }
 
 @layer components {
-  /* Boutons */
+  /* ── Boutons ─────────────────────────────────────────── */
   .btn {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
            transition-all duration-150 cursor-pointer select-none;
   }
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+    @apply btn bg-primary-600 text-white hover:bg-primary-500 active:bg-primary-700;
   }
   .btn-secondary {
     @apply btn bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100;
+    @apply dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 dark:active:bg-gray-600;
   }
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 active:bg-red-800;
+    @apply btn bg-red-600 text-white hover:bg-red-500 active:bg-red-700;
   }
   .btn-ghost {
     @apply btn text-gray-600 hover:bg-gray-100 active:bg-gray-200;
+    @apply dark:text-gray-400 dark:hover:bg-gray-800 dark:active:bg-gray-700;
   }
   .btn-sm {
     @apply px-3 py-1.5 text-xs rounded-md;
   }
   .btn-icon {
     @apply p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors;
+    @apply dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200;
   }
 
-  /* Champs de formulaire */
+  /* ── Formulaires ─────────────────────────────────────── */
   .form-input {
     @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm
            placeholder-gray-400 shadow-sm
-           focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200
+           focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30
            transition-colors;
+    @apply dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500
+           dark:focus:border-primary-400 dark:focus:ring-primary-400/20;
   }
   .form-select {
     @apply form-input appearance-none pr-8 cursor-pointer;
   }
   .form-label {
     @apply block text-xs font-medium text-gray-600 mb-1;
+    @apply dark:text-gray-400;
   }
 
-  /* Table */
+  /* ── Table ───────────────────────────────────────────── */
   .table-wrapper {
     @apply overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm;
+    @apply dark:border-gray-700 dark:bg-gray-900;
   }
   .data-table {
     @apply min-w-full divide-y divide-gray-200 text-sm;
+    @apply dark:divide-gray-700;
   }
   .data-table thead {
     @apply bg-gray-50;
+    @apply dark:bg-gray-800;
   }
   .data-table th {
     @apply px-3 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider
            select-none whitespace-nowrap;
+    @apply dark:text-gray-400;
   }
   .data-table th.sortable {
     @apply cursor-pointer hover:text-gray-700 hover:bg-gray-100 transition-colors;
+    @apply dark:hover:text-gray-200 dark:hover:bg-gray-700;
   }
   .data-table td {
     @apply px-3 py-2.5 whitespace-nowrap text-gray-700;
+    @apply dark:text-gray-300;
   }
   .data-table tbody tr {
     @apply border-b border-gray-100 hover:bg-primary-50/40 transition-colors;
+    @apply dark:border-gray-800 dark:hover:bg-primary-900/20;
   }
   .data-table tbody tr.selected {
     @apply bg-primary-50;
+    @apply dark:bg-primary-900/30;
   }
 
-  /* Badge */
+  /* ── Badge ───────────────────────────────────────────── */
   .badge {
     @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
   }
 
-  /* Modal */
+  /* ── Modal ───────────────────────────────────────────── */
   .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm;
+    @apply fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm;
   }
   .modal-panel {
     @apply relative bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4
            max-h-[90vh] overflow-y-auto;
+    @apply dark:bg-gray-900 dark:border dark:border-gray-700;
   }
   .modal-header {
     @apply flex items-center justify-between px-6 py-4 border-b border-gray-200;
+    @apply dark:border-gray-700;
   }
   .modal-body {
     @apply px-6 py-5;
   }
   .modal-footer {
     @apply flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl;
+    @apply dark:border-gray-700 dark:bg-gray-800/60;
   }
 
-  /* Card */
+  /* ── Card ────────────────────────────────────────────── */
   .card {
     @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+    @apply dark:bg-gray-900 dark:border-gray-700;
   }
 
-  /* Montants */
+  /* ── Montants ────────────────────────────────────────── */
   .amount-credit {
-    @apply text-green-600 font-semibold font-mono;
+    @apply text-emerald-500 font-semibold font-mono;
   }
   .amount-debit {
-    @apply text-red-600 font-semibold font-mono;
+    @apply text-red-400 font-semibold font-mono;
+  }
+
+  /* ── Pagination ──────────────────────────────────────── */
+  .pagination-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-medium
+           transition-colors border border-gray-200 bg-white text-gray-700
+           hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300
+           dark:hover:bg-gray-700 dark:disabled:opacity-30;
+  }
+  .pagination-btn.active {
+    @apply bg-primary-600 border-primary-600 text-white hover:bg-primary-500;
+    @apply dark:bg-primary-600 dark:border-primary-600 dark:text-white dark:hover:bg-primary-500;
   }
 }

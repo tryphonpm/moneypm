@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "backup": "node scripts/backup.mjs"
   },
   "dependencies": {
     "mongoose": "^8.9.0",
