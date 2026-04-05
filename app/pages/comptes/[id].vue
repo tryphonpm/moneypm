@@ -107,6 +107,31 @@ function fmt(v: number) {
   return v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+// ── Backup ─────────────────────────────────────────────────
+const backing     = ref(false)
+const backupToast = ref('')
+
+async function createBackup() {
+  backing.value     = true
+  backupToast.value = ''
+  try {
+    const res = await $fetch<{ folder: string; collections: Record<string, number> }>(
+      '/api/backup',
+      { method: 'POST' }
+    )
+    const stats = Object.entries(res.collections)
+      .map(([k, v]) => `${v} ${k}`)
+      .join(', ')
+    backupToast.value = `✔ Backup créé — ${res.folder} (${stats})`
+    setTimeout(() => { backupToast.value = '' }, 5000)
+  } catch (e: unknown) {
+    backupToast.value = `✖ ${(e as { data?: { message?: string } })?.data?.message || 'Erreur backup'}`
+    setTimeout(() => { backupToast.value = '' }, 5000)
+  } finally {
+    backing.value = false
+  }
+}
+
 // ── Import ─────────────────────────────────────────────────
 function onImported() {
   showImport.value = false
@@ -134,15 +159,48 @@ function onSaved(updated: Transaction) {
         <h1 class="text-2xl font-bold text-gray-100">{{ compte ? compte.BANQUE : '…' }}</h1>
         <p class="text-sm text-gray-500 font-mono mt-0.5">{{ compte ? compte.numero_compte : '' }}</p>
       </div>
-      <button class="btn-primary" @click="showImport = true">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5
-               M16.5 12L12 16.5m0 0L7.5 12M12 16.5V3" />
-        </svg>
-        Importer OFX
-      </button>
+      <div class="flex items-center gap-2">
+        <!-- Backup -->
+        <button class="btn-secondary" :disabled="backing" @click="createBackup">
+          <svg v-if="backing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5
+                 M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-.375c0-.621-.504-1.125-1.125-1.125H3.375
+                 c-.621 0-1.125.504-1.125 1.125v.375c0 .621.504 1.125 1.125 1.125z" />
+          </svg>
+          {{ backing ? 'Sauvegarde…' : 'Créer un backup' }}
+        </button>
+
+        <!-- Import OFX -->
+        <button class="btn-primary" @click="showImport = true">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5
+                 M16.5 12L12 16.5m0 0L7.5 12M12 16.5V3" />
+          </svg>
+          Importer OFX
+        </button>
+      </div>
     </div>
+
+    <!-- Toast backup -->
+    <Transition enter-from-class="opacity-0 -translate-y-2" leave-to-class="opacity-0 -translate-y-2" enter-active-class="transition duration-200" leave-active-class="transition duration-200">
+      <div
+        v-if="backupToast"
+        :class="[
+          'rounded-lg px-4 py-3 text-sm font-medium',
+          backupToast.startsWith('✔')
+            ? 'bg-emerald-900/40 border border-emerald-700 text-emerald-300'
+            : 'bg-red-900/40 border border-red-700 text-red-300'
+        ]"
+      >
+        {{ backupToast }}
+      </div>
+    </Transition>
 
     <!-- Modale import -->
     <AppModal v-if="showImport" title="Importer un fichier OFX" @close="showImport = false">

@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "backup": "node scripts/backup.mjs"
+    "backup": "node scripts/backup.mjs",
+    "import-ofx": "node scripts/import-ofx.mjs"
   },
   "dependencies": {
     "mongoose": "^8.9.0",
